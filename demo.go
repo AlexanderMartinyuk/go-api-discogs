@@ -1,9 +1,7 @@
 package main
 
 import (
-    "io"
-    "os"
-    "github.com/Martinyuk/discogs/api"
+    "bitbucket.org/Martinyuk/discogs/api"
 )
 
 func main() {
