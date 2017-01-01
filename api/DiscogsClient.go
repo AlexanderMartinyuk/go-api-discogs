@@ -11,6 +11,7 @@ const (
 	apiURL            string = "https://api.discogs.com/"
 	artistURL         string = apiURL + "artists/%s"
 	releasesURL       string = apiURL + "artists/%s/releases"
+	mastersURL        string = apiURL + "masters/%s"
 	searchURL         string = apiURL + "database/search?"
 )
 
@@ -54,24 +55,11 @@ func (dc *DiscogsClient) Search(query string) (r *DSearch, err error) {
     return dc.search(params)
 }
 
-func (dc *DiscogsClient) search(values url.Values) (r *DSearch, err error) {
-	r = &DSearch{}
-	
-	values.Add("token", dc.token)
-    
-	err = dc.fetchApiJson(searchURL, values, r)
-	if err != nil {
-		return nil, err
-	}
-
-	return r, nil
-}
-
 // GetReleasesByArtistID search for artists by id
 func (dc *DiscogsClient) GetReleasesByArtistID(artistID string) (r *DReleases, err error) {
     r = &DReleases{}
-		   
 	url := fmt.Sprintf(releasesURL, artistID)
+	
 	err = dc.fetchApiJson(url, nil, r)
 	if err != nil {
 		return nil, err
@@ -80,12 +68,37 @@ func (dc *DiscogsClient) GetReleasesByArtistID(artistID string) (r *DReleases, e
 	return r, nil
 }
 
-// GetReleasesByArtistID search for artists by id
+// GetArtistByID search for artists by id
 func (dc *DiscogsClient) GetArtistByID(artistID string) (r *DArtist, err error) {
     r = &DArtist{}
-		   
 	url := fmt.Sprintf(artistURL, artistID)
+	
 	err = dc.fetchApiJson(url, nil, r)
+	if err != nil {
+		return nil, err
+	}
+
+	return r, nil
+}
+
+// GetReleaseDetailsByID search for artists by id
+func (dc *DiscogsClient) GetReleaseDetailsByID(releaseID string) (r *DReleaseDetails, err error) {
+    r = &DReleaseDetails{}
+	url := fmt.Sprintf(mastersURL, releaseID)
+	
+	err = dc.fetchApiJson(url, nil, r)
+	if err != nil {
+		return nil, err
+	}
+
+	return r, nil
+}
+
+func (dc *DiscogsClient) search(values url.Values) (r *DSearch, err error) {
+	r = &DSearch{}
+	values.Add("token", dc.token)
+    
+	err = dc.fetchApiJson(searchURL, values, r)
 	if err != nil {
 		return nil, err
 	}

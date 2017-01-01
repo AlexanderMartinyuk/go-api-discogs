@@ -38,6 +38,18 @@ func main() {
         release := releases.Releases[i]
         println("Title ", release.Title, " year: ", release.Year)
 	}
+
+    // Get release details by release ID.
+    details, err := client.GetReleaseDetailsByID("111886")
+    if err != nil {
+        panic(err)
+    }
+
+    println("Releases: ")
+    for i := 0; i < len(details.Tracklist); i++ {
+        track := details.Tracklist[i]
+        println("Title ", track.Title, " position: ", track.Position)
+	}
 }
 
 

@@ -92,3 +92,42 @@ type DArtist struct {
 	DataQuality string `json:"data_quality"`
 	Namevariations []string `json:"namevariations"`
 }
+
+type DReleaseDetails struct {
+	Styles []string `json:"styles"`
+	Artists []struct {
+		Join string `json:"join"`
+		Name string `json:"name"`
+		Anv string `json:"anv"`
+		Tracks string `json:"tracks"`
+		Role string `json:"role"`
+		ResourceURL string `json:"resource_url"`
+		ID int `json:"id"`
+	} `json:"artists"`
+	VersionsURL string `json:"versions_url"`
+	Year int `json:"year"`
+	Images []struct {
+		URI string `json:"uri"`
+		Height int `json:"height"`
+		Width int `json:"width"`
+		ResourceURL string `json:"resource_url"`
+		Type string `json:"type"`
+		URI150 string `json:"uri150"`
+	} `json:"images"`
+	ID int `json:"id"`
+	Tracklist []struct {
+		Duration string `json:"duration"`
+		Position string `json:"position"`
+		Type string `json:"type_"`
+		Title string `json:"title"`
+	} `json:"tracklist"`
+	Genres []string `json:"genres"`
+	NumForSale int `json:"num_for_sale"`
+	Title string `json:"title"`
+	MainRelease int `json:"main_release"`
+	MainReleaseURL string `json:"main_release_url"`
+	URI string `json:"uri"`
+	ResourceURL string `json:"resource_url"`
+	LowestPrice float64 `json:"lowest_price"`
+	DataQuality string `json:"data_quality"`
+}
