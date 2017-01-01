@@ -3,14 +3,15 @@ package api
 import (
     "net/url"
     "net/http"
-    "os"
     "encoding/json"
     "fmt"
 )
 
 const (
-	apiURL            string = "https://api.discogs.com/database"
-	searchURL         string = apiURL + "/search?"
+	apiURL            string = "https://api.discogs.com/"
+	artistURL         string = apiURL + "artists/%s"
+	releasesURL       string = apiURL + "artists/%s/releases"
+	searchURL         string = apiURL + "database/search?"
 )
 
 // DiscogsClient provides the client and associated elements for interacting with the www.discogs.com
@@ -58,30 +59,54 @@ func (dc *DiscogsClient) search(values url.Values) (r *DSearch, err error) {
 	
 	values.Add("token", dc.token)
     
-	if err := dc.fetchApiJson(searchURL, values, r); err != nil {
-		return r, err
+	err = dc.fetchApiJson(searchURL, values, r)
+	if err != nil {
+		return nil, err
 	}
-	return r, err
+
+	return r, nil
 }
 
+// GetReleasesByArtistID search for artists by id
+func (dc *DiscogsClient) GetReleasesByArtistID(artistID string) (r *DReleases, err error) {
+    r = &DReleases{}
+		   
+	url := fmt.Sprintf(releasesURL, artistID)
+	err = dc.fetchApiJson(url, nil, r)
+	if err != nil {
+		return nil, err
+	}
+
+	return r, nil
+}
+
+// GetReleasesByArtistID search for artists by id
+func (dc *DiscogsClient) GetArtistByID(artistID string) (r *DArtist, err error) {
+    r = &DArtist{}
+		   
+	url := fmt.Sprintf(artistURL, artistID)
+	err = dc.fetchApiJson(url, nil, r)
+	if err != nil {
+		return nil, err
+	}
+
+	return r, nil
+}
 
 // fetchApiJson makes a request to the API and decodes the response.
 // `actionUrl` is the final path component that specifies the API call
 // `parameters` include the API key
 // `result` is modified as an output parameter. It must be a pointer to a ZC JSON structure.
 func (dc *DiscogsClient) fetchApiJson(actionUrl string, values url.Values, result interface{}) (err error) {
-	var resp *http.Response
-	resp, err = dc.makeApiGetRequest(actionUrl, values)
+	
+	resp, err := dc.makeApiGetRequest(actionUrl, values)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
+
 	dec := json.NewDecoder(resp.Body)
-	if err = dec.Decode(result); err != nil {
-		return err
-	}
-	//TODO checkServiceError(body)
-	return err
+	return dec.Decode(result)
 }
 
 // makeApiGetRequest fetches a URL with querystring via HTTP GET and
@@ -89,18 +114,28 @@ func (dc *DiscogsClient) fetchApiJson(actionUrl string, values url.Values, resul
 // `parameters` should not include the apikey.
 // The caller must call `resp.Body.Close()`.
 func (dc *DiscogsClient) makeApiGetRequest(fullUrl string, values url.Values) (resp *http.Response, err error) {
-	req, err := http.NewRequest("GET", fullUrl+values.Encode(), nil)
+	
+	req, err := http.NewRequest("GET", fullUrl + values.Encode(), nil)
 	if err != nil {
 		return resp, err
 	}
+	
 	resp, err = dc.client.Do(req)
 	if err != nil {
 		return resp, err
 	}
+	
 	if resp.StatusCode != 200 {
-		var msg string = fmt.Sprintf("Unexpected status code: %d", resp.StatusCode)
-		resp.Write(os.Stdout)
-		return resp, ClientError{msg: msg}
+		msg := &DError{}
+		dec := json.NewDecoder(resp.Body)
+		
+		err = dec.Decode(msg)
+		if err != nil {
+			return resp, err
+		}
+		
+		return resp, ClientError{msg: msg.Message}
 	}
+	
 	return resp, nil
 }
