@@ -1,57 +1,57 @@
 package main
 
 import (
-    "bitbucket.org/Martinyuk/discogs/api"
+	"bitbucket.org/Martinyuk/discogs/api"
+	"strconv"
 )
 
 func main() {
-    client := api.NewDiscogsClient(nil, "HNmJpKxApdkwljeHZxXRMFGgGVMfsODoOJojIXfh")
-    
-    // Search artists and releases by text.
-    search, err := client.Search("Океан Ельзи")
-    if err != nil {
-        panic(err)
-    }
+	client := api.NewDiscogsClient(nil, "HNmJpKxApdkwljeHZxXRMFGgGVMfsODoOJojIXfh")
 
-    println("Search results: ")
-    for i := 0; i < len(search.Results); i++ {
-        track := search.Results[i]
-        println("Title ", track.Title, " type: ", track.Type)
+	// Search for artists and releases by text.
+	search, err := client.Search("Океан Ельзи")
+	if err != nil {
+		panic(err)
 	}
 
-    // Get specified artist by ID.
-    artist, err := client.GetArtistByID("125748")
-    if err != nil {
-        panic(err)
-    }
-
-    println("Name ", artist.Name, " Profile: ", artist.Profile)
-
-    // Get all releases of specified specified artist by artist ID.
-    releases, err := client.GetReleasesByArtistID("125748")
-    if err != nil {
-        panic(err)
-    }
-
-    println("Releases: ")
-    for i := 0; i < len(releases.Releases); i++ {
-        release := releases.Releases[i]
-        println("Title ", release.Title, " year: ", release.Year)
+	println("Search results: ")
+	for i := 0; i < len(search.Results); i++ {
+		result := search.Results[i]
+		println("Title: ", result.Title, " type: ", result.Type, " id: ", strconv.Itoa(result.ID))
 	}
 
-    // Get release details by release ID.
-    details, err := client.GetReleaseDetailsByID("111886")
-    if err != nil {
-        panic(err)
-    }
+	// Get specified artist by ID.
+	// This is immutable ID of Okean Elzy group in Discogs database. You can get this ID as result of Search.
+	const okeanElzyGroupID = 125748
+	artist, err := client.GetArtistByID(okeanElzyGroupID)
+	if err != nil {
+		panic(err)
+	}
 
-    println("Releases: ")
-    for i := 0; i < len(details.Tracklist); i++ {
-        track := details.Tracklist[i]
-        println("Title ", track.Title, " position: ", track.Position)
+	println("Name: ", artist.Name, " Profile: ", artist.Profile)
+
+	// Get all releases of specified artist by artist ID.
+	releases, err := client.GetReleasesByArtistID(okeanElzyGroupID)
+	if err != nil {
+		panic(err)
+	}
+
+	println("Releases: ")
+	for i := 0; i < len(releases.Releases); i++ {
+		release := releases.Releases[i]
+		println("Title: ", release.Title, " year: ", release.Year, " id: ", strconv.Itoa(release.ID))
+	}
+
+	// Get release details by release ID.
+	const yananebibuvReleaseID = 111886
+	details, err := client.GetReleaseDetailsByID(yananebibuvReleaseID)
+	if err != nil {
+		panic(err)
+	}
+
+	println("Tracks: ")
+	for i := 0; i < len(details.Tracklist); i++ {
+		track := details.Tracklist[i]
+		println("Title: ", track.Title, " position: ", track.Position, " duration: ", track.Duration)
 	}
 }
-
-
-
-
