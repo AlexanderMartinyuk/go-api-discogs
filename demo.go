@@ -1,12 +1,12 @@
 package main
 
 import (
-	"bitbucket.org/Martinyuk/discogs/api"
+	"AlexanderMartinyuk/go-api-discogs/api"
 	"strconv"
 )
 
 func main() {
-	client := api.NewDiscogsClient(nil, "HNmJpKxApdkwljeHZxXRMFGgGVMfsODoOJojIXfh")
+	client := api.NewDiscogsClient(nil, "your_access_key")
 
 	// Search for artists and releases by text.
 	search, err := client.Search("Океан Ельзи")
