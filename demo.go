@@ -1,7 +1,7 @@
 package main
 
 import (
-	"AlexanderMartinyuk/go-api-discogs/api"
+	"github.com/AlexanderMartinyuk/go-api-discogs/api"
 	"strconv"
 )
 
